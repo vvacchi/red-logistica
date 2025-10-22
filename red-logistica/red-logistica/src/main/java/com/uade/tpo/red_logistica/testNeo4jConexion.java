@@ -20,7 +20,7 @@ public class TestNeo4jConexion implements CommandLineRunner {
     @Override
     public void run(String... args) {
         try (var session = driver.session()) {
-            var result = session.run("RETURN 'Conexión exitosa con Neo4j' AS msg");
+            var result = session.run("RETURN 'Conexion exitosa con Neo4j' AS msg");
             log.info(result.single().get("msg").asString());
         } catch (Exception e) {
             log.error("Error conectando a Neo4j", e);
