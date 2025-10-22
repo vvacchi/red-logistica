@@ -8,12 +8,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Component
-public class testNeo4jConexion implements CommandLineRunner {
+public class TestNeo4jConexion implements CommandLineRunner {
 
-    private static final Logger log = LoggerFactory.getLogger(testNeo4jConexion.class);
+    private static final Logger log = LoggerFactory.getLogger(TestNeo4jConexion.class);
     private final Driver driver;
 
-    public testNeo4jConexion(Driver driver) {
+    public TestNeo4jConexion(Driver driver) {
         this.driver = driver;
     }
 
