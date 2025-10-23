@@ -7,11 +7,11 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
-public class LogisticaService {
+public class BFSService {
 
     private final CentroDistribucionRepository repo;
 
-    public LogisticaService(CentroDistribucionRepository repo) {
+    public BFSService(CentroDistribucionRepository repo) {
         this.repo = repo;
     }
 

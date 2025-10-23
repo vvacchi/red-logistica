@@ -1,6 +1,6 @@
 package com.uade.tpo.red_logistica.controller;
 
-import com.uade.tpo.red_logistica.service.LogisticaService;
+import com.uade.tpo.red_logistica.service.BFSService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -9,9 +9,9 @@ import java.util.List;
 @RequestMapping("/api/logistica")
 public class LogisticaController {
 
-    private final LogisticaService service;
+    private final BFSService service;
 
-    public LogisticaController(LogisticaService service) {
+    public LogisticaController(BFSService service) {
         this.service = service;
     }
 
