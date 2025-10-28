@@ -17,7 +17,6 @@ public interface CentroDistribucionRepository extends Neo4jRepository<CentroDist
     @Query("MATCH (c:CentroDistribucion {nombre: $nombre})-[:CONECTA_CON]->(dest) RETURN dest")
     List<CentroDistribucion> obtenerConexiones(String nombre);
 
-    // 🔹 Solución: devolver un solo valor (mapa literal con destino y peso)
     @Query("""
         MATCH (a:CentroDistribucion {nombre: $nombre})-[r:CONECTA_CON]->(b:CentroDistribucion)
         RETURN {destino: b.nombre,
@@ -29,4 +28,19 @@ public interface CentroDistribucionRepository extends Neo4jRepository<CentroDist
                       END} AS conexion
         """)
     List<Map<String, Object>> obtenerConexionesConPeso(String nombre, String peso);
+
+    @Query("MATCH (c:Cliente) RETURN c.nombre AS nombre")
+    List<String> obtenerClientes();
+
+    @Query("""
+        MATCH (cli:Cliente {nombre: $cliente})-[r:CONECTA_CON]->(centro:CentroDistribucion)
+        RETURN centro.nombre AS nombreCentro,
+            CASE $peso
+                    WHEN 'distancia' THEN r.distancia
+                    WHEN 'tiempo' THEN r.tiempo
+                    WHEN 'costo' THEN r.costo
+                    ELSE r.distancia
+            END AS peso
+        """)
+    List<Map<String, Object>> obtenerCentrosConPesosPorCliente(String cliente, String peso);
 }
