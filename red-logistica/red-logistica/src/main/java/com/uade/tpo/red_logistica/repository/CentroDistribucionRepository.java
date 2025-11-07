@@ -43,4 +43,17 @@ public interface CentroDistribucionRepository extends Neo4jRepository<CentroDist
             END AS peso
         """)
     List<Map<String, Object>> obtenerCentrosConPesosPorCliente(String cliente, String peso);
+
+    /*@Query("""
+        MATCH (a:CentroDistribucion)-[r:CONECTA_CON]->(b:CentroDistribucion)
+        RETURN a.nombre AS origen,
+            b.nombre AS destino,
+            CASE $peso
+                    WHEN 'distancia' THEN r.distancia
+                    WHEN 'tiempo' THEN r.tiempo
+                    WHEN 'costo' THEN r.costo
+                    ELSE r.distancia
+            END AS peso
+        """)
+    List<org.neo4j.driver.Record> obtenerTodasLasRutas(String peso);*/
 }

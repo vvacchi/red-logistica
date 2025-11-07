@@ -1,10 +1,8 @@
 package com.uade.tpo.red_logistica.controller;
 
-import com.uade.tpo.red_logistica.service.GreedyService;
-import com.uade.tpo.red_logistica.service.BFSService;
-import com.uade.tpo.red_logistica.service.DFSService;
-import com.uade.tpo.red_logistica.service.DijkstraService;
-import com.uade.tpo.red_logistica.dto.ResultadoAsignacionDTO;
+import com.uade.tpo.red_logistica.service.*;
+
+import com.uade.tpo.red_logistica.dto.*;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,15 +16,18 @@ public class LogisticaController {
     private final DFSService dfsService;
     private final DijkstraService dijkstraService;
     private final GreedyService greedyService;
+    private final MergeSortService mergeSortService;
 
     public LogisticaController(BFSService bfsService,
                                DFSService dfsService,
                                DijkstraService dijkstraService,
-                               GreedyService greedyService) {
+                               GreedyService greedyService,
+                               MergeSortService mergeSortService) {
         this.bfsService = bfsService;
         this.dfsService = dfsService;
         this.dijkstraService = dijkstraService;
         this.greedyService = greedyService;
+        this.mergeSortService = mergeSortService;
     }
 
     // --- BFS ---
@@ -54,5 +55,9 @@ public class LogisticaController {
     public List<ResultadoAsignacionDTO> asignacionGreedy(
             @RequestParam(defaultValue = "distancia") String peso) {
         return greedyService.asignarClientes(peso);
+    }
+    @GetMapping("/ordenar-rutas")
+    public List<RutaDTO> ordenarRutas(@RequestParam(defaultValue = "distancia") String criterio) {
+        return mergeSortService.ordenarRutas(criterio);
     }
 }
