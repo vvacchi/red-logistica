@@ -17,17 +17,20 @@ public class LogisticaController {
     private final DijkstraService dijkstraService;
     private final GreedyService greedyService;
     private final MergeSortService mergeSortService;
+    private final PDService pdService;
 
     public LogisticaController(BFSService bfsService,
                                DFSService dfsService,
                                DijkstraService dijkstraService,
                                GreedyService greedyService,
-                               MergeSortService mergeSortService) {
+                               MergeSortService mergeSortService,
+                               PDService pdService) {
         this.bfsService = bfsService;
         this.dfsService = dfsService;
         this.dijkstraService = dijkstraService;
         this.greedyService = greedyService;
         this.mergeSortService = mergeSortService;
+        this.pdService = pdService;
     }
 
     // --- BFS ---
@@ -59,5 +62,9 @@ public class LogisticaController {
     @GetMapping("/ordenar-rutas")
     public List<RutaDTO> ordenarRutas(@RequestParam(defaultValue = "distancia") String criterio) {
         return mergeSortService.ordenarRutas(criterio);
+    }
+    @PostMapping("/pd-capacidad")
+    public AsignacionCapacidadDTO asignarCapacidad(@RequestParam String centro, @RequestParam double capacidad) {
+        return pdService.resolverAsignacion(centro, capacidad);
     }
 }
