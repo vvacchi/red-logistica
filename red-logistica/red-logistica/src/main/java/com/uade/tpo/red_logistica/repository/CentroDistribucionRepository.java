@@ -8,6 +8,10 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Map;
 
+import com.uade.tpo.red_logistica.model.nodes.Cliente;
+import com.uade.tpo.red_logistica.dto.ConexionDTO;
+
+
 @Repository
 public interface CentroDistribucionRepository extends Neo4jRepository<CentroDistribucion, Long> {
 
@@ -30,16 +34,16 @@ public interface CentroDistribucionRepository extends Neo4jRepository<CentroDist
     List<Map<String, Object>> obtenerConexionesConPeso(String nombre, String peso);
 
     @Query("MATCH (c:Cliente) RETURN c.nombre AS nombre")
-    List<String> obtenerClientes();
+    List<String> obtenerNombresClientes();
 
-    @Query("""
-        MATCH (cli:Cliente {nombre: $cliente})-[r:CONECTA_CON]->(centro:CentroDistribucion)
+   @Query("""
+        MATCH (cli:Cliente {nombre: $cliente})-[:ATENDIDO_POR]->(centro:CentroDistribucion)
         RETURN centro.nombre AS nombreCentro,
             CASE $peso
-                    WHEN 'distancia' THEN r.distancia
-                    WHEN 'tiempo' THEN r.tiempo
-                    WHEN 'costo' THEN r.costo
-                    ELSE r.distancia
+                WHEN 'distancia' THEN 10
+                WHEN 'tiempo' THEN 15
+                WHEN 'costo' THEN 20
+                ELSE 10
             END AS peso
         """)
     List<Map<String, Object>> obtenerCentrosConPesosPorCliente(String cliente, String peso);
