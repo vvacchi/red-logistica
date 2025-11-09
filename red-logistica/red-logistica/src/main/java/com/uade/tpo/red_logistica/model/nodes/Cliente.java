@@ -1,6 +1,7 @@
 package com.uade.tpo.red_logistica.model.nodes;
 
 import org.springframework.data.neo4j.core.schema.Id;
+import org.springframework.data.neo4j.core.schema.Property;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
 
@@ -8,9 +9,12 @@ import org.springframework.data.neo4j.core.schema.Relationship;
 public class Cliente {
     @Id
     private Long id;
+    
+    @Property("nombre")
     private String nombre;
+
     private String zona;
-    private int demanda;
+    private Integer demanda;
 
     @Relationship(type = "ATENDIDO_POR")
     private CentroDistribucion centro;
@@ -46,7 +50,7 @@ public class Cliente {
         return demanda;
     }
 
-    public void setDemanda(int demanda) {
+    public void setDemanda(Integer demanda) {
         this.demanda = demanda;
     }
 
