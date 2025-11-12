@@ -37,13 +37,13 @@ public interface CentroDistribucionRepository extends Neo4jRepository<CentroDist
     List<String> obtenerNombresClientes();
 
    @Query("""
-        MATCH (cli:Cliente {nombre: $cliente})-[:ATENDIDO_POR]->(centro:CentroDistribucion)
+        MATCH (cli:Cliente {nombre: $cliente})-[r:ATENDIDO_POR]->(centro:CentroDistribucion)
         RETURN centro.nombre AS nombreCentro,
             CASE $peso
-                WHEN 'distancia' THEN 10
-                WHEN 'tiempo' THEN 15
-                WHEN 'costo' THEN 20
-                ELSE 10
+                WHEN 'distancia' THEN r.distancia
+                WHEN 'tiempo' THEN r.tiempo
+                WHEN 'costo' THEN r.costo
+                ELSE r.distancia
             END AS peso
         """)
     List<Map<String, Object>> obtenerCentrosConPesosPorCliente(String cliente, String peso);
