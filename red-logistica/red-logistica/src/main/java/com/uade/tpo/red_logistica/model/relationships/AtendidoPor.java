@@ -6,7 +6,7 @@ import org.springframework.data.neo4j.core.schema.RelationshipProperties;
 import org.springframework.data.neo4j.core.schema.TargetNode;
 import com.uade.tpo.red_logistica.model.nodes.CentroDistribucion;
 
-@RelationshipProperties("ATENDIDO_POR") // Especifica el tipo de relación
+@RelationshipProperties
 public class AtendidoPor {
 
     @Id

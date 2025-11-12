@@ -2,6 +2,7 @@ package com.uade.tpo.red_logistica.model.nodes;
 
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Property;
+import com.uade.tpo.red_logistica.model.relationships.AtendidoPor; 
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
 
@@ -17,7 +18,7 @@ public class Cliente {
     private Integer demanda;
 
     @Relationship(type = "ATENDIDO_POR")
-    private CentroDistribucion centro;
+    private AtendidoPor centro;
 
     public Cliente() {}
     // getters y setters
@@ -54,11 +55,11 @@ public class Cliente {
         this.demanda = demanda;
     }
 
-    public CentroDistribucion getCentro() {
+    public AtendidoPor getCentro() {
         return centro;
     }
 
-    public void setCentro(CentroDistribucion centro) {
+    public void setCentro(AtendidoPor centro) {
         this.centro = centro;
     }
 }
