@@ -15,21 +15,25 @@ import com.uade.tpo.red_logistica.dto.ConexionDTO;
 @Repository
 public interface CentroDistribucionRepository extends Neo4jRepository<CentroDistribucion, Long> {
 
+    CentroDistribucion findByNombre(String nombre);
+
     @Query("MATCH (c:CentroDistribucion) RETURN c")
     List<CentroDistribucion> obtenerTodos();
 
     @Query("MATCH (c:CentroDistribucion {nombre: $nombre})-[:CONECTA_CON]->(dest) RETURN dest")
     List<CentroDistribucion> obtenerConexiones(String nombre);
 
-    @Query("""
+   @Query("""
         MATCH (a:CentroDistribucion {nombre: $nombre})-[r:CONECTA_CON]->(b:CentroDistribucion)
-        RETURN {destino: b.nombre,
-                peso: CASE $peso
-                        WHEN 'distancia' THEN r.distancia
-                        WHEN 'tiempo' THEN r.tiempo
-                        WHEN 'costo' THEN r.costo
-                        ELSE r.distancia
-                      END} AS conexion
+        RETURN {
+            destino: b.nombre,
+            peso: CASE $peso
+                WHEN 'distancia' THEN r.distancia
+                WHEN 'tiempo' THEN r.tiempo
+                WHEN 'costo' THEN r.costo
+                ELSE r.distancia
+            END
+        } AS data
         """)
     List<Map<String, Object>> obtenerConexionesConPeso(String nombre, String peso);
 
@@ -38,26 +42,34 @@ public interface CentroDistribucionRepository extends Neo4jRepository<CentroDist
 
    @Query("""
         MATCH (cli:Cliente {nombre: $cliente})-[r:ATENDIDO_POR]->(centro:CentroDistribucion)
-        RETURN centro.nombre AS nombreCentro,
-            CASE $peso
+        RETURN {
+            nombreCentro: centro.nombre,
+            peso: CASE $peso
                 WHEN 'distancia' THEN r.distancia
                 WHEN 'tiempo' THEN r.tiempo
                 WHEN 'costo' THEN r.costo
                 ELSE r.distancia
-            END AS peso
+            END
+        } AS data
         """)
     List<Map<String, Object>> obtenerCentrosConPesosPorCliente(String cliente, String peso);
 
-    /*@Query("""
-        MATCH (a:CentroDistribucion)-[r:CONECTA_CON]->(b:CentroDistribucion)
-        RETURN a.nombre AS origen,
-            b.nombre AS destino,
-            CASE $peso
-                    WHEN 'distancia' THEN r.distancia
-                    WHEN 'tiempo' THEN r.tiempo
-                    WHEN 'costo' THEN r.costo
-                    ELSE r.distancia
-            END AS peso
+   @Query("""
+        MATCH (a:CentroDistribucion {nombre: $origen})-[r:CONECTA_CON]->(b:CentroDistribucion {nombre: $destino})
+        RETURN r.distancia
         """)
-    List<org.neo4j.driver.Record> obtenerTodasLasRutas(String peso);*/
+    Double obtenerDistancia(String origen, String destino);
+
+    @Query("""
+        MATCH (a:CentroDistribucion {nombre: $origen})-[r:CONECTA_CON]->(b:CentroDistribucion {nombre: $destino})
+        RETURN r.tiempo
+        """)
+    Double obtenerTiempo(String origen, String destino);
+
+    @Query("""
+        MATCH (a:CentroDistribucion {nombre: $origen})-[r:CONECTA_CON]->(b:CentroDistribucion {nombre: $destino})
+        RETURN r.costo
+        """)
+    Double obtenerCosto(String origen, String destino);
 }
+
