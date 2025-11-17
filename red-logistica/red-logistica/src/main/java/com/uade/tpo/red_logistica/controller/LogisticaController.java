@@ -18,19 +18,25 @@ public class LogisticaController {
     private final GreedyService greedyService;
     private final MergeSortService mergeSortService;
     private final PDService pdService;
+    private final BacktrackingService backtrackingService;
+    private final BranchAndBoundService branchAndBoundService;
 
     public LogisticaController(BFSService bfsService,
                                DFSService dfsService,
                                DijkstraService dijkstraService,
                                GreedyService greedyService,
                                MergeSortService mergeSortService,
-                               PDService pdService) {
+                               PDService pdService,
+                               BacktrackingService backtrackingService,
+                               BranchAndBoundService branchAndBoundService) {
         this.bfsService = bfsService;
         this.dfsService = dfsService;
         this.dijkstraService = dijkstraService;
         this.greedyService = greedyService;
         this.mergeSortService = mergeSortService;
         this.pdService = pdService;
+        this.backtrackingService = backtrackingService;
+        this.branchAndBoundService = branchAndBoundService;
     }
 
     // --- BFS ---
@@ -67,4 +73,13 @@ public class LogisticaController {
     public AsignacionCapacidadDTO asignarCapacidad(@RequestParam String centro, @RequestParam double capacidad) {
         return pdService.resolverAsignacion(centro, capacidad);
     }
+    @PostMapping("/backtracking")
+    public RutaOptimaDTO backtracking(@RequestBody BacktrackingRequestDTO dto) {
+        return backtrackingService.resolver(dto);
+    }
+    @PostMapping("/branch-and-bound")
+    public RutaOptimaDTO resolverBranch(@RequestBody BranchAndBoundRequestDTO dto) {
+        return branchAndBoundService.resolver(dto);
+    }
+
 }
