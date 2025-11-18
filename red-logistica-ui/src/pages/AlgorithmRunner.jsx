@@ -3,6 +3,7 @@ import { useAlgorithm } from "../context/AlgorithmContext.jsx";
 
 // Importar componentes
 import DijkstraComponent from "../components/algorithms/DijkstraComponent.jsx";
+import BFSComponent from "../components/algorithms/BFSComponent";
 
 export default function AlgorithmRunner() {
   const { algorithm } = useAlgorithm();
@@ -13,7 +14,7 @@ export default function AlgorithmRunner() {
         return <DijkstraComponent />;
 
       case "bfs":
-        return <div className="card"><h2>BFS</h2><p>Próximamente</p></div>;
+        return <BFSComponent />;
 
       case "dfs":
         return <div className="card"><h2>DFS</h2><p>Próximamente</p></div>;
