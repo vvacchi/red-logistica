@@ -1,16 +1,33 @@
 import { useState } from "react";
-import { useApi } from "../../hooks/useApi";
+import { useApi } from "../../hooks/useApi.js";
+import { API_URL } from "../../api/config.js"; 
 
 export default function BranchAndBoundComponent() {
     const { request, data, loading, error } = useApi();
 
-    const [origen, setOrigen] = useState("");
-    const [destino, setDestino] = useState("");
-    const [limite, setLimite] = useState("");
+    // 1. EL USUARIO INGRESA TODOS LOS NODOS QUE DEBE VISITAR
+    const [nodosRaw, setNodosRaw] = useState(""); 
+    const [criterio, setCriterio] = useState("distancia");
 
     const ejecutar = async () => {
-        const dto = { origen, destino, limite: Number(limite) };
-        await request(`/branch-and-bound`, {
+        if (!nodosRaw) return;
+
+        // Convertimos el string "A, B, C" a un array ["A", "B", "C"]
+        const listaNodos = nodosRaw.split(",").map((n) => n.trim()).filter((n) => n !== "");
+
+        if (listaNodos.length < 2) {
+            alert("Necesitas al menos dos nodos para calcular una ruta óptima.");
+            return;
+        }
+        
+        // Construimos el DTO exacto que espera Java (BranchAndBoundRequestDTO)
+        const dto = { 
+            nodos: listaNodos, 
+            criterio: criterio 
+        };
+
+        // El endpoint es el mismo que para Backtracking, pero la lógica del service es diferente.
+        await request(`${API_URL}/branch-and-bound`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(dto)
@@ -19,25 +36,29 @@ export default function BranchAndBoundComponent() {
 
     return (
         <div>
-            <h2>Branch & Bound</h2>
-
-            <div className="form-group">
-                <label>Origen</label>
-                <input value={origen} onChange={(e) => setOrigen(e.target.value)} />
+            <h2>Branch & Bound (Ruta Óptima - TSP)</h2>
+            <small>Calcula el camino más corto que visita todos los nodos listados, utilizando cotas para acelerar la búsqueda.</small>
+            
+            <div className="form-group" style={{ marginTop: '15px' }}>
+                <label>Nodos a Visitar (separados por coma)</label>
+                <input 
+                    value={nodosRaw} 
+                    onChange={(e) => setNodosRaw(e.target.value)} 
+                    placeholder="Ej: Quilmes Oeste, Avellaneda, Morón, Ituzaingo"
+                />
             </div>
 
             <div className="form-group">
-                <label>Destino</label>
-                <input value={destino} onChange={(e) => setDestino(e.target.value)} />
-            </div>
-
-            <div className="form-group">
-                <label>Límite</label>
-                <input value={limite} onChange={(e) => setLimite(e.target.value)} />
+                <label>Criterio</label>
+                <select value={criterio} onChange={(e) => setCriterio(e.target.value)}>
+                    <option value="distancia">Distancia</option>
+                    <option value="tiempo">Tiempo</option>
+                    <option value="costo">Costo</option>
+                </select>
             </div>
 
             <button className="button-primary" onClick={ejecutar} disabled={loading}>
-                {loading ? "Explorando..." : "Ejecutar"}
+                {loading ? "Calculando cota..." : "Ejecutar"}
             </button>
 
             <div className="result-container">
@@ -47,8 +68,20 @@ export default function BranchAndBoundComponent() {
 
                 {data && (
                     <>
-                        <p><b>Camino:</b> {data.camino?.join(" → ")}</p>
-                        <p><b>Total:</b> {data.total}</p>
+                        {/* Mapeamos la respuesta del RutaOptimaDTO */}
+                        <div style={{ marginBottom: '15px', padding: '10px', background: '#f0f0f0', borderRadius: '5px' }}>
+                            <p><b>Algoritmo:</b> {data.algoritmo}</p>
+                            <p><b>Costo Total ({data.criterio}):</b> {Number(data.costoTotal).toFixed(2)}</p>
+                            <p><b>Número de Nodos Optimizados:</b> {data.ruta ? data.ruta.length : 0}</p>
+                        </div>
+
+                        {data.ruta && data.ruta.length > 0 ? (
+                            <p className="ruta-visual" style={{ fontWeight: 'bold' }}>
+                                {data.ruta.join(" ➝ ")}
+                            </p>
+                        ) : (
+                            <p>No se encontró una ruta válida para visitar todos los nodos.</p>
+                        )}
                     </>
                 )}
             </div>
