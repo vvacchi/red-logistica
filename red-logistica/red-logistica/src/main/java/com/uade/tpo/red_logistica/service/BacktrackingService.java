@@ -1,5 +1,6 @@
 package com.uade.tpo.red_logistica.service;
 
+import com.uade.tpo.red_logistica.service.BFSService;
 import com.uade.tpo.red_logistica.dto.BacktrackingRequestDTO;
 import com.uade.tpo.red_logistica.dto.RutaOptimaDTO;
 import com.uade.tpo.red_logistica.model.nodes.CentroDistribucion;
@@ -12,13 +13,15 @@ import java.util.*;
 public class BacktrackingService {
 
     private final CentroDistribucionRepository repo;
+    private final BFSService bfsService;  
 
     private double mejorCosto;
     private List<String> mejorRuta;
     private String criterio;
 
-    public BacktrackingService(CentroDistribucionRepository repo) {
+    public BacktrackingService(CentroDistribucionRepository repo, BFSService bfsService) {
         this.repo = repo;
+        this.bfsService = bfsService;
     }
 
     public RutaOptimaDTO resolver(BacktrackingRequestDTO request) {
@@ -27,18 +30,30 @@ public class BacktrackingService {
         this.mejorCosto = Double.MAX_VALUE;
         this.mejorRuta = new ArrayList<>();
 
-        // Origen
+        // Obtener origen
         CentroDistribucion origen = repo.findByNombre(request.getOrigen());
         if (origen == null)
             throw new RuntimeException("El centro origen no existe: " + request.getOrigen());
 
-        // Destinos
+        // Obtener destinos
         List<CentroDistribucion> destinos = new ArrayList<>();
         for (String nombre : request.getDestinos()) {
             CentroDistribucion c = repo.findByNombre(nombre);
             if (c == null)
                 throw new RuntimeException("Destino inexistente: " + nombre);
             destinos.add(c);
+        }
+
+        // VALIDACIÓN DE CONECTIVIDAD
+        for (String destino : request.getDestinos()) {
+            if (!existeCamino(origen.getNombre(), destino)) {
+                return new RutaOptimaDTO(
+                        List.of(),
+                        Double.POSITIVE_INFINITY,
+                        criterio,
+                        "BACKTRACKING - NODOS NO CONECTADOS"
+                );
+            }
         }
 
         Set<String> visitados = new HashSet<>();
@@ -51,7 +66,6 @@ public class BacktrackingService {
 
         return new RutaOptimaDTO(mejorRuta, mejorCosto, criterio, "BACKTRACKING");
     }
-
 
     private void backtracking(CentroDistribucion actual,
                               List<CentroDistribucion> destinos,
@@ -88,12 +102,16 @@ public class BacktrackingService {
         }
     }
 
-
     private Double getPeso(String origen, String destino) {
         return switch (criterio) {
             case "tiempo" -> repo.obtenerTiempo(origen, destino);
             case "costo" -> repo.obtenerCosto(origen, destino);
             default -> repo.obtenerDistancia(origen, destino);
         };
+    }
+
+    private boolean existeCamino(String origen, String destino) {
+        List<String> alcanzables = bfsService.recorridoBFS(origen);
+        return alcanzables.contains(destino);
     }
 }

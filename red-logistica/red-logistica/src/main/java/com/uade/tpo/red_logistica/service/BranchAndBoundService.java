@@ -1,9 +1,11 @@
 package com.uade.tpo.red_logistica.service;
 
+import com.uade.tpo.red_logistica.service.BFSService; 
 import com.uade.tpo.red_logistica.dto.BranchAndBoundRequestDTO;
 import com.uade.tpo.red_logistica.dto.RutaOptimaDTO;
 import com.uade.tpo.red_logistica.repository.CentroDistribucionRepository;
 import org.springframework.stereotype.Service;
+import com.uade.tpo.red_logistica.service.DijkstraService;
 
 import java.util.*;
 
@@ -11,13 +13,16 @@ import java.util.*;
 public class BranchAndBoundService {
 
     private final CentroDistribucionRepository repo;
+    private final DijkstraService dijkstraService;
 
     private List<String> mejorRuta;
     private double mejorCosto;
     private String criterio;
 
-    public BranchAndBoundService(CentroDistribucionRepository repo) {
+    public BranchAndBoundService(CentroDistribucionRepository repo,
+                                 DijkstraService dijkstraService) {
         this.repo = repo;
+        this.dijkstraService = dijkstraService;
     }
 
     public RutaOptimaDTO resolver(BranchAndBoundRequestDTO request) {
@@ -29,6 +34,7 @@ public class BranchAndBoundService {
         List<String> nodos = request.getNodos();
         int n = nodos.size();
 
+        // MATRIZ DE PESOS USANDO DIJKSTRA
         double[][] m = new double[n][n];
 
         for (int i = 0; i < n; i++) {
@@ -37,8 +43,19 @@ public class BranchAndBoundService {
                 if (i == j) {
                     m[i][j] = 0;
                 } else {
-                    Double peso = getPeso(nodos.get(i), nodos.get(j));
-                    m[i][j] = (peso == null) ? Double.MAX_VALUE : peso;
+                    try {
+                        Map<String, Object> result = dijkstraService.calcularCaminoMinimo(
+                                nodos.get(i), nodos.get(j), criterio);
+
+                        if (result.get("distanciaTotal") instanceof Number num) {
+                            m[i][j] = num.doubleValue();
+                        } else {
+                            m[i][j] = Double.MAX_VALUE;
+                        }
+
+                    } catch (Exception e) {
+                        m[i][j] = Double.MAX_VALUE; // No hay camino
+                    }
                 }
             }
         }
@@ -50,6 +67,10 @@ public class BranchAndBoundService {
         rutaActual.add(0);
 
         branch(m, visitados, rutaActual, 0, 0, nodos);
+
+        if (mejorRuta.isEmpty())
+            return new RutaOptimaDTO(List.of(), Double.POSITIVE_INFINITY, criterio,
+                    "BRANCH_AND_BOUND - NODOS NO CONECTADOS");
 
         return new RutaOptimaDTO(mejorRuta, mejorCosto, criterio, "BRANCH_AND_BOUND");
     }
@@ -67,7 +88,7 @@ public class BranchAndBoundService {
         if (rutaActual.size() == n) {
             if (costoActual < mejorCosto) {
                 mejorCosto = costoActual;
-                mejorRuta = rutaActual.stream().map(i -> nodos.get(i)).toList();
+                mejorRuta = rutaActual.stream().map(nodos::get).toList();
             }
             return;
         }
@@ -93,14 +114,12 @@ public class BranchAndBoundService {
         }
     }
 
-
     private double cotaInferior(double[][] m, boolean[] visitados) {
         double cota = 0;
 
         for (int i = 0; i < m.length; i++) {
             if (!visitados[i]) {
                 double min = Double.MAX_VALUE;
-
                 for (int j = 0; j < m.length; j++) {
                     if (i != j && m[i][j] < min) {
                         min = m[i][j];
@@ -111,13 +130,5 @@ public class BranchAndBoundService {
         }
         return cota;
     }
-
-
-    private Double getPeso(String origen, String destino) {
-        return switch (criterio) {
-            case "tiempo" -> repo.obtenerTiempo(origen, destino);
-            case "costo" -> repo.obtenerCosto(origen, destino);
-            default -> repo.obtenerDistancia(origen, destino);
-        };
-    }
 }
+
