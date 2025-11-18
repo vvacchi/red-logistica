@@ -56,20 +56,23 @@ public interface CentroDistribucionRepository extends Neo4jRepository<CentroDist
     List<Map<String, Object>> obtenerCentrosConPesosPorCliente(String cliente, String peso);
 
    @Query("""
-        MATCH (a:CentroDistribucion {nombre: $origen})-[r:CONECTA_CON]->(b:CentroDistribucion {nombre: $destino})
-        RETURN r.distancia
+        MATCH (o:CentroDistribucion {nombre: $origen}), (d:CentroDistribucion {nombre: $destino}) 
+        MATCH p = shortestPath((o)-[:CONECTA_CON*]->(d)) 
+        RETURN reduce(s = 0.0, r IN relationships(p) | s + r.distancia)
         """)
     Double obtenerDistancia(String origen, String destino);
 
     @Query("""
-        MATCH (a:CentroDistribucion {nombre: $origen})-[r:CONECTA_CON]->(b:CentroDistribucion {nombre: $destino})
-        RETURN r.tiempo
+        MATCH (o:CentroDistribucion {nombre: $origen}), (d:CentroDistribucion {nombre: $destino}) 
+        MATCH p = shortestPath((o)-[:CONECTA_CON*]->(d)) 
+        RETURN reduce(s = 0.0, r IN relationships(p) | s + r.tiempo)
         """)
     Double obtenerTiempo(String origen, String destino);
 
     @Query("""
-        MATCH (a:CentroDistribucion {nombre: $origen})-[r:CONECTA_CON]->(b:CentroDistribucion {nombre: $destino})
-        RETURN r.costo
+        MATCH (o:CentroDistribucion {nombre: $origen}), (d:CentroDistribucion {nombre: $destino}) 
+        MATCH p = shortestPath((o)-[:CONECTA_CON*]->(d)) 
+        RETURN reduce(s = 0.0, r IN relationships(p) | s + r.costo)
         """)
     Double obtenerCosto(String origen, String destino);
 
@@ -87,7 +90,7 @@ public interface CentroDistribucionRepository extends Neo4jRepository<CentroDist
             END AS peso
     """)
     List<ResultadoAsignacionDTO> obtenerPesosPorClienteConGrafo(String cliente, String criterio);
-
+    
 
 }
 
