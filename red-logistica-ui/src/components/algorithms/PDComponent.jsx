@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useApi } from "../../hooks/useApi";
+import { API_URL } from "../../api/config.js"; 
 
 export default function PDComponent() {
     const { request, data, loading, error } = useApi();
@@ -8,7 +9,8 @@ export default function PDComponent() {
 
     const ejecutar = async () => {
         if (!centro || !capacidad) return;
-        await request(`/pd-capacidad?centro=${centro}&capacidad=${capacidad}`, { method: "POST" });
+        // Enviamos la petición
+        await request(`${API_URL}/pd-capacidad?centro=${centro}&capacidad=${capacidad}`, { method: "POST" });
     };
 
     return (
@@ -16,13 +18,22 @@ export default function PDComponent() {
             <h2>Programación Dinámica (Asignación por Capacidad)</h2>
 
             <div className="form-group">
-                <label>Centro</label>
-                <input value={centro} onChange={(e) => setCentro(e.target.value)} />
+                <label>Centro (Nombre exacto)</label>
+                <input 
+                    value={centro} 
+                    onChange={(e) => setCentro(e.target.value)} 
+                    placeholder="Ej: Centro Norte"
+                />
             </div>
 
             <div className="form-group">
-                <label>Capacidad</label>
-                <input type="number" value={capacidad} onChange={(e) => setCapacidad(e.target.value)} />
+                <label>Capacidad Máxima</label>
+                <input 
+                    type="number" 
+                    value={capacidad} 
+                    onChange={(e) => setCapacidad(e.target.value)} 
+                    placeholder="Ej: 200"
+                />
             </div>
 
             <button className="button-primary" onClick={ejecutar} disabled={loading}>
@@ -36,13 +47,29 @@ export default function PDComponent() {
 
                 {data && (
                     <>
-                        <p><b>Capacidad utilizada:</b> {data.capacidadUsada}</p>
-                        <p><b>Clientes asignados:</b></p>
-                        <ul>
-                            {data.clientes.map((c, i) => (
-                                <li key={i}>{c}</li>
-                            ))}
-                        </ul>
+                        <div style={{ marginBottom: '15px', padding: '10px', background: '#f0f0f0', borderRadius: '5px' }}>
+                            <p><b>Centro:</b> {data.centro}</p>
+                            <p><b>Capacidad Máxima:</b> {data.capacidadMaxima}</p>
+                            {/* Usamos toFixed(2) para redondear los decimales largos */}
+                            <p><b>Carga Total Lograda:</b> {Number(data.cargaTotal).toFixed(2)}</p>
+                            <p><b>Clientes Asignados:</b> {data.cantidadClientes}</p>
+                        </div>
+
+                        <h4>Detalle de Clientes Seleccionados:</h4>
+                        
+                        {data.clientesSeleccionados && data.clientesSeleccionados.length > 0 ? (
+                            <ul>
+                                {data.clientesSeleccionados.map((cliente, i) => (
+                                    <li key={i}>
+                                        <b>{cliente.nombre}</b>
+                                        {" — "} 
+                                        Demanda: {Number(cliente.demanda).toFixed(2)}
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <p>No se seleccionaron clientes para esta capacidad.</p>
+                        )}
                     </>
                 )}
             </div>
