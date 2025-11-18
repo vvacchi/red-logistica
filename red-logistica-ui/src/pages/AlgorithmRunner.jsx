@@ -3,7 +3,8 @@ import { useAlgorithm } from "../context/AlgorithmContext.jsx";
 
 // Importar componentes
 import DijkstraComponent from "../components/algorithms/DijkstraComponent.jsx";
-import BFSComponent from "../components/algorithms/BFSComponent";
+import BFSComponent from "../components/algorithms/BFSComponent.jsx";
+import DFSComponent from "../components/algorithms/DFSComponent.jsx";
 
 export default function AlgorithmRunner() {
   const { algorithm } = useAlgorithm();
@@ -17,7 +18,7 @@ export default function AlgorithmRunner() {
         return <BFSComponent />;
 
       case "dfs":
-        return <div className="card"><h2>DFS</h2><p>Próximamente</p></div>;
+        return <DFSComponent />;
 
       case "greedy":
         return <div className="card"><h2>Greedy</h2><p>Próximamente</p></div>;

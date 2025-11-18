@@ -1,41 +1,47 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import { API_URL } from "../../api/config";
 import { useApi } from "../../hooks/useApi";
 
 export default function DFSComponent() {
-    const { request, data, loading, error } = useApi();
-    const [origen, setOrigen] = useState("");
+  const { request, data, loading, error } = useApi();
+  const [origen, setOrigen] = useState("");
 
-    const ejecutar = async () => {
-        if (!origen.trim()) return;
-        await request(`/dfs/${origen}`);
-    };
+  const ejecutar = async () => {
+    if (!origen.trim()) return;
 
-    return (
-        <div>
-            <h2>DFS (Recorrido en Profundidad)</h2>
+    const url = `${API_URL}/dfs/${encodeURIComponent(origen)}`;
 
-            <div className="form-group">
-                <label>Origen</label>
-                <input
-                    value={origen}
-                    onChange={(e) => setOrigen(e.target.value)}
-                    placeholder="Ejemplo: Centro Norte"
-                />
-            </div>
+    await request(url);
+  };
 
-            <button className="button-primary" onClick={ejecutar} disabled={loading}>
-                {loading ? "Ejecutando..." : "Ejecutar"}
-            </button>
+  return (
+    <div className="card">
+      <h2>DFS (Recorrido en Profundidad)</h2>
 
-            <div className="result-container">
-                <h3>Resultado</h3>
+      <div className="form-group">
+        <label>Origen</label>
+        <input
+          value={origen}
+          onChange={(e) => setOrigen(e.target.value)}
+          placeholder="Centro Norte"
+        />
+      </div>
 
-                {error && <p style={{ color: "red" }}>{error}</p>}
+      <button className="button-primary" onClick={ejecutar} disabled={loading}>
+        {loading ? "Cargando..." : "Ejecutar"}
+      </button>
 
-                {data && (
-                    <p><b>Recorrido:</b> {data.join(" → ")}</p>
-                )}
-            </div>
-        </div>
-    );
+      <div className="result-container">
+        <h3>Resultado</h3>
+
+        {error && <p style={{ color: "red" }}>{error}</p>}
+
+        {data && (
+          <p>
+            <strong>Recorrido:</strong> {data.join(" → ")}
+          </p>
+        )}
+      </div>
+    </div>
+  );
 }
