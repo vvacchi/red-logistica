@@ -37,7 +37,6 @@ export default function GreedyComponent() {
                     <ul>
                         {data.map((item, i) => (
                             <li key={i}>
-                                {/* AJUSTADO PARA COINCIDIR CON TU DTO JAVA */}
                                 <b>{item.centroAsignado} → {item.cliente}</b>  
                                 {" — "}Peso: {item.peso}
                             </li>
