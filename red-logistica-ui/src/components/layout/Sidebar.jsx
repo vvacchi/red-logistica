@@ -1,5 +1,5 @@
 import React from "react";
-import { useAlgorithm } from "../../context/AlgorithmContext";
+import { useAlgorithm } from "../../context/AlgorithmContext.jsx";
 
 export default function Sidebar() {
   const { algorithm, setAlgorithm } = useAlgorithm();

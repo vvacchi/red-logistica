@@ -1,8 +1,8 @@
 import React from "react";
-import { useAlgorithm } from "../context/AlgorithmContext";
+import { useAlgorithm } from "../context/AlgorithmContext.jsx";
 
 // Importar componentes
-import DijkstraComponent from "../components/algorithms/DijkstraComponent";
+import DijkstraComponent from "../components/algorithms/DijkstraComponent.jsx";
 
 export default function AlgorithmRunner() {
   const { algorithm } = useAlgorithm();

@@ -1,20 +1,22 @@
-// src/App.js
-import React from 'react';
-import DijkstraComponent from '../src/components/DijkstraComponent.jsx';
-import './App.css';
+import React from "react";
+import "./App.css";
 
-function App() {
+import Sidebar from "./components/layout/Sidebar.jsx";
+import AlgorithmRunner from "./pages/AlgorithmRunner.jsx";
+import { AlgorithmProvider } from "./context/AlgorithmContext.jsx";
+
+
+export default function App() {
   return (
-    <div className="App">
+    <AlgorithmProvider>
       <header className="App-header">
-        <h1>Dashboard de Red Logística</h1>
+        Red Logística – Panel de Algoritmos
       </header>
-      <main>
-        <DijkstraComponent />
-        {/* Aquí puedes agregar más componentes para las otras funcionalidades */}
-      </main>
-    </div>
+
+      <div className="layout">
+        <Sidebar />
+        <AlgorithmRunner />
+      </div>
+    </AlgorithmProvider>
   );
 }
-
-export default App;
