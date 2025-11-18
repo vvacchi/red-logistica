@@ -5,6 +5,11 @@ import { useAlgorithm } from "../context/AlgorithmContext.jsx";
 import DijkstraComponent from "../components/algorithms/DijkstraComponent.jsx";
 import BFSComponent from "../components/algorithms/BFSComponent.jsx";
 import DFSComponent from "../components/algorithms/DFSComponent.jsx";
+import GreedyComponent from "../components/algorithms/GreedyComponent.jsx";
+import MergeSortComponent from "../components/algorithms/MergeSortComponent.jsx";
+import PDComponent from "../components/algorithms/PDComponent.jsx";
+import BacktrackingComponent from "../components/algorithms/BacktrackingComponent.jsx";
+import BranchAndBoundComponent from "../components/algorithms/BranchAndBoundComponent.jsx";
 
 export default function AlgorithmRunner() {
   const { algorithm } = useAlgorithm();
@@ -21,19 +26,19 @@ export default function AlgorithmRunner() {
         return <DFSComponent />;
 
       case "greedy":
-        return <div className="card"><h2>Greedy</h2><p>Próximamente</p></div>;
+        return <GreedyComponent />;
 
       case "mergesort":
-        return <div className="card"><h2>MergeSort</h2><p>Próximamente</p></div>;
+        return <MergeSortComponent />;
 
       case "pd":
-        return <div className="card"><h2>Programación Dinámica</h2><p>Próximamente</p></div>;
+        return <PDComponent />;
 
       case "backtracking":
-        return <div className="card"><h2>Backtracking</h2><p>Próximamente</p></div>;
+        return <BacktrackingComponent />;
 
       case "branchbound":
-        return <div className="card"><h2>Branch & Bound</h2><p>Próximamente</p></div>;
+        return <BranchAndBoundComponent />;
 
       default:
         return null;

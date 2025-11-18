@@ -1,12 +1,14 @@
 import { useState } from "react";
-import { useApi } from "../../hooks/useApi";
+import { useApi } from "../../hooks/useApi.js";
+import { API_URL } from "../../api/config.js"; 
 
 export default function GreedyComponent() {
     const { request, data, loading, error } = useApi();
     const [criterio, setCriterio] = useState("distancia");
 
     const ejecutar = async () => {
-        await request(`/greedy-asignacion?peso=${criterio}`);
+        // Usamos la URL completa hacia el backend (puerto 8080)
+        await request(`${API_URL}/greedy-asignacion?peso=${criterio}`);
     };
 
     return (
@@ -35,8 +37,9 @@ export default function GreedyComponent() {
                     <ul>
                         {data.map((item, i) => (
                             <li key={i}>
-                                <b>{item.centro} → {item.cliente}</b>  
-                                {" — "}Peso: {item.valor}
+                                {/* AJUSTADO PARA COINCIDIR CON TU DTO JAVA */}
+                                <b>{item.centroAsignado} → {item.cliente}</b>  
+                                {" — "}Peso: {item.peso}
                             </li>
                         ))}
                     </ul>
