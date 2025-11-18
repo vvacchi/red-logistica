@@ -1,5 +1,6 @@
 package com.uade.tpo.red_logistica.repository;
 
+import com.uade.tpo.red_logistica.dto.*;
 import com.uade.tpo.red_logistica.model.nodes.CentroDistribucion;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.neo4j.repository.query.Query;
@@ -71,5 +72,22 @@ public interface CentroDistribucionRepository extends Neo4jRepository<CentroDist
         RETURN r.costo
         """)
     Double obtenerCosto(String origen, String destino);
+
+    @Query("""
+        MATCH (cli:Cliente {nombre: $cliente})-[:ATENDIDO_POR]->(centro:CentroDistribucion)
+        MATCH (centro)-[r:CONECTA_CON]->(otro:CentroDistribucion)
+        RETURN 
+            cli.nombre AS cliente,
+            otro.nombre AS centroAsignado,
+            CASE $criterio
+                WHEN 'distancia' THEN r.distancia
+                WHEN 'tiempo' THEN r.tiempo
+                WHEN 'costo' THEN r.costo
+                ELSE r.distancia
+            END AS peso
+    """)
+    List<ResultadoAsignacionDTO> obtenerPesosPorClienteConGrafo(String cliente, String criterio);
+
+
 }
 
