@@ -1,12 +1,14 @@
 import { useState } from "react";
-import { useApi } from "../../hooks/useApi";
+import { useApi } from "../../hooks/useApi.js";
+import { API_URL } from "../../api/config.js"; 
 
 export default function MergeSortComponent() {
     const { request, data, loading, error } = useApi();
     const [criterio, setCriterio] = useState("distancia");
 
     const ejecutar = async () => {
-        await request(`/ordenar-rutas?criterio=${criterio}`);
+        // Concatenamos la URL base correctamente
+        await request(`${API_URL}/ordenar-rutas?criterio=${criterio}`);
     };
 
     return (
@@ -31,10 +33,16 @@ export default function MergeSortComponent() {
 
                 {error && <p style={{ color: "red" }}>{error}</p>}
 
-                {data && (
+                {data && data.length > 0 && (
                     <ul>
                         {data.map((r, i) => (
-                            <li key={i}>{r.origen} → {r.destino} — {criterio}: {r.valor}</li>
+                            <li key={i}>
+                                {/* Usamos las propiedades exactas del JSON: origen, destino, peso */}
+                                <b>{r.origen} → {r.destino}</b> 
+                                {" — "} 
+                                {/* Mostramos el nombre del criterio elegido, pero el valor siempre viene en r.peso */}
+                                {criterio.charAt(0).toUpperCase() + criterio.slice(1)}: {r.peso}
+                            </li>
                         ))}
                     </ul>
                 )}
